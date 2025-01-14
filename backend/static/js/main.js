@@ -122,11 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadGame() {
-        const { ticker, company, prices, dates } = currentStockData;
+        const { ticker, company, prices, dates, visibleDays } = currentStockData;
         stockName.textContent = `${company} (${ticker})`;
 
-        const visiblePrices = prices.slice(0, -1);
-        const visibleDates = dates.slice(0, -1);
+        const visiblePrices = prices.slice(0, visibleDays);
+        const visibleDates = dates.slice(0, visibleDays);
 
         if (currentChart) {
             currentChart.destroy();
@@ -221,10 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function evaluatePrediction() {
-        const { prices, dates } = currentStockData;
-        const lastPrice = prices[prices.length - 1];
-        const previousPrice = prices[prices.length - 2];
-        const percentageChange = ((lastPrice - previousPrice) / previousPrice * 100);
+        const { prices, dates, visibleDays, predictionDays } = currentStockData;
+        const lastVisiblePrice = prices[visibleDays - 1];
+        const futurePrice = prices[visibleDays + predictionDays - 1];
+        const percentageChange = ((futurePrice - lastVisiblePrice) / lastVisiblePrice * 100);
 
         function determineCategory(change) {
             if (change <= -3) return "very bearish";
@@ -280,23 +280,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     borderWidth: 2,
                     fill: false,
                     pointRadius: (ctx) => {
-                        if (ctx.dataIndex === prices.length - 1) return 8;
-                        if (ctx.dataIndex === prices.length - 2) return 8;
+                        if (ctx.dataIndex === visibleDays + predictionDays - 1) return 8;
+                        if (ctx.dataIndex === visibleDays - 1) return 8;
                         return 4;
                     },
                     pointBackgroundColor: (ctx) => {
-                        if (ctx.dataIndex === prices.length - 1) return 'red';
-                        if (ctx.dataIndex === prices.length - 2) return 'blue';
+                        if (ctx.dataIndex === visibleDays + predictionDays - 1) return 'red';
+                        if (ctx.dataIndex === visibleDays - 1) return 'blue';
                         return 'rgb(75, 192, 192)';
                     },
                     pointBorderColor: (ctx) => {
-                        if (ctx.dataIndex === prices.length - 1 || ctx.dataIndex === prices.length - 2) {
+                        if (ctx.dataIndex === visibleDays + predictionDays - 1 || ctx.dataIndex === visibleDays - 1) {
                             return '#fff';
                         }
                         return '#fff';
                     },
                     pointBorderWidth: (ctx) => {
-                        if (ctx.dataIndex === prices.length - 1 || ctx.dataIndex === prices.length - 2) {
+                        if (ctx.dataIndex === visibleDays + predictionDays - 1 || ctx.dataIndex === visibleDays - 1) {
                             return 2;
                         }
                         return 1;
@@ -318,9 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         callbacks: {
                             label: function(context) {
                                 let label = `Price: $${context.raw.toFixed(2)}`;
-                                if (context.dataIndex === prices.length - 1) {
+                                if (context.dataIndex === visibleDays + predictionDays - 1) {
                                     label += ' (Final Price)';
-                                } else if (context.dataIndex === prices.length - 2) {
+                                } else if (context.dataIndex === visibleDays - 1) {
                                     label += ' (Reference Price)';
                                 }
                                 return label;
@@ -341,6 +341,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         grid: {
                             display: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 10,
+                            maxRotation: 45,
+                            minRotation: 45
                         }
                     },
                     y: {

@@ -35,7 +35,7 @@ def get_stock():
         ticker = stock['ticker']
         company = stock['company']
 
-        # Fetch last 3 months of data (changed from 1mo to 3mo)
+        # Fetch last 3 months of data plus one week for prediction
         data = yf.download(ticker, period='3mo', interval='1d')
 
         if data.empty:
@@ -47,17 +47,22 @@ def get_stock():
         history = close_data.values.tolist()
         dates = data.index.strftime('%Y-%m-%d').tolist()
 
-        # Show all data except the last day (which will be revealed after prediction)
-        visible_days = len(history) - 1
+        # Show all data except the last week (which will be revealed after prediction)
+        prediction_days = 5  # 5 trading days = 1 week
+        visible_days = len(history) - prediction_days
 
-        # Determine actual change (up/down) based on the last visible day and the next day
-        actual_change = 'up' if history[-1] > history[-2] else 'down'
+        # Determine actual change (up/down) based on the last visible day and the next week
+        last_visible_price = history[visible_days - 1]
+        future_price = history[visible_days + prediction_days - 1]
+        actual_change = 'up' if future_price > last_visible_price else 'down'
 
         return jsonify({
             'ticker': ticker,
             'company': company,
-            'prices': history,  # Send all prices
-            'dates': dates,     # Send all dates
+            'prices': history,
+            'dates': dates,
+            'visibleDays': visible_days,
+            'predictionDays': prediction_days,
             'actualChange': actual_change
         })
 
