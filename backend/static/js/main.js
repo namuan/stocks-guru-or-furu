@@ -232,11 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create new chart with all data points
         const ctx = document.getElementById('result-chart').getContext('2d');
 
-        // Convert prices to numbers and add highlight for the last point
+        // Convert prices to numbers
         const chartData = prices.map((price, index) => parseFloat(price));
-        const backgroundColors = prices.map((_, index) =>
-            index === prices.length - 1 ? 'red' : 'rgb(75, 192, 192)'
-        );
 
         currentChart = new Chart(ctx, {
             type: 'line',
@@ -250,10 +247,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     tension: 0.1,
                     borderWidth: 2,
                     fill: false,
-                    pointRadius: (ctx) => ctx.dataIndex === prices.length - 1 ? 6 : 4,
-                    pointBackgroundColor: backgroundColors,
-                    pointBorderColor: '#fff',
-                    pointHoverRadius: 6,
+                    pointRadius: (ctx) => {
+                        if (ctx.dataIndex === prices.length - 1) return 8;
+                        if (ctx.dataIndex === prices.length - 2) return 8;
+                        return 4;
+                    },
+                    pointBackgroundColor: (ctx) => {
+                        if (ctx.dataIndex === prices.length - 1) return 'red';
+                        if (ctx.dataIndex === prices.length - 2) return 'blue';
+                        return 'rgb(75, 192, 192)';
+                    },
+                    pointBorderColor: (ctx) => {
+                        if (ctx.dataIndex === prices.length - 1 || ctx.dataIndex === prices.length - 2) {
+                            return '#fff';
+                        }
+                        return '#fff';
+                    },
+                    pointBorderWidth: (ctx) => {
+                        if (ctx.dataIndex === prices.length - 1 || ctx.dataIndex === prices.length - 2) {
+                            return 2;
+                        }
+                        return 1;
+                    },
+                    pointHoverRadius: 8,
                 }]
             },
             options: {
@@ -269,7 +285,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         intersect: false,
                         callbacks: {
                             label: function(context) {
-                                return `Price: $${context.raw.toFixed(2)}`;
+                                let label = `Price: $${context.raw.toFixed(2)}`;
+                                if (context.dataIndex === prices.length - 1) {
+                                    label += ' (Final Price)';
+                                } else if (context.dataIndex === prices.length - 2) {
+                                    label += ' (Reference Price)';
+                                }
+                                return label;
                             }
                         }
                     }
