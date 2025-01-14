@@ -125,6 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const { ticker, company, prices, dates, visibleDays } = currentStockData;
         stockName.textContent = `${company} (${ticker})`;
 
+        // Add question text
+        document.getElementById('prediction-question').textContent =
+            `Based on this 3-month price history, how do you think ${ticker} stock will perform over the next week?`;
+
         const visiblePrices = prices.slice(0, visibleDays);
         const visibleDates = dates.slice(0, visibleDays);
 
@@ -235,6 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const actualCategory = determineCategory(percentageChange);
+
+        let resultSummary;
+        if (userPrediction === actualCategory) {
+            resultSummary = `Correct! The stock went ${actualCategory} (${percentageChange.toFixed(2)}%)`;
+        } else {
+            resultSummary = `Not quite. The stock went ${actualCategory} (${percentageChange.toFixed(2)}%)`;
+        }
+        document.getElementById('result-title').textContent = resultSummary;
 
         let pointsEarned = 0;
         totalPredictions++;

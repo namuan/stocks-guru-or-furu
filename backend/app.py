@@ -1,5 +1,6 @@
 import logging
 import random
+from datetime import datetime, timedelta
 
 import yfinance as yf
 from flask import Flask, render_template, jsonify
@@ -35,8 +36,20 @@ def get_stock():
         ticker = stock['ticker']
         company = stock['company']
 
-        # Fetch last 3 months of data plus one week for prediction
-        data = yf.download(ticker, period='3mo', interval='1d')
+        # Get 10 years of data
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=365 * 10)
+
+        # Get a random date between start_date and (end_date - 3 months - 1 week)
+        max_random_date = end_date - timedelta(days=100)  # 3 months + ~1 week
+        random_days = (max_random_date - start_date).days
+        random_date = start_date + timedelta(days=random.randint(0, random_days))
+
+        # Calculate the end date for our 3-month + 1-week window
+        period_end_date = random_date + timedelta(days=100)  # ~3 months + 1 week
+
+        # Fetch data for our random 3-month + 1-week period
+        data = yf.download(ticker, start=random_date, end=period_end_date, interval='1d')
 
         if data.empty:
             return jsonify({'error': 'No data found for the selected stock.'}), 404
