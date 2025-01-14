@@ -52,9 +52,6 @@ def get_stock():
         if len(history) < visible_days + 1:
             return jsonify({'error': 'Not enough data for the selected stock.'}), 400
 
-        visible_history = history[:visible_days]
-        visible_dates = dates[:visible_days]
-
         # Determine actual change (up/down) based on the last visible day and the next day
         actual_change = 'up' if history[visible_days] > history[visible_days - 1] else 'down'
 
