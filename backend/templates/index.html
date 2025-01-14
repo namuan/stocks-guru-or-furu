@@ -15,6 +15,12 @@
     <button id="start-game-btn">Start Game</button>
 </div>
 
+<!-- Loading Screen -->
+<div id="loading-screen" class="screen">
+    <h2>Loading next stock...</h2>
+    <div class="spinner"></div> <!-- Optional: Add a spinner for better UX -->
+</div>
+
 <!-- Game Screen -->
 <div id="game-screen" class="screen">
     <h2 id="stock-name">Company Name (TICKER)</h2>
@@ -35,6 +41,14 @@
     <p>Your Prediction: <span id="user-prediction"></span></p>
     <p>Actual Outcome: <span id="actual-outcome"></span></p>
     <button id="next-round-btn">Next Round</button>
+</div>
+
+<!-- Error Screen -->
+<div id="error-screen" class="screen">
+    <h2>Error</h2>
+    <p id="error-message">An error occurred while fetching stock data.</p>
+    <button id="retry-btn">Try Again</button>
+    <button id="back-home-btn">Back to Home</button>
 </div>
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
