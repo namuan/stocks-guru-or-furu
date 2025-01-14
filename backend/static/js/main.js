@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Prediction Buttons
     const predictButtons = document.querySelectorAll('.predict-btn');
+    const streakSpan = document.getElementById('streak');
+    let currentStreak = 0;
 
     let currentScore = 0;
     let currentChart = null; // To manage Chart.js instances
@@ -93,7 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Destroy existing chart if any
         if (currentChart) {
             currentChart.destroy();
+            currentStreak += 1;
+        } else {
+            currentStreak = 0;
         }
+        streakSpan.textContent = currentStreak;
 
         const ctx = document.getElementById('stock-chart').getContext('2d');
         currentChart = new Chart(ctx, {
@@ -139,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const { prices, dates, actualChange } = currentStockData;
 
         // Determine actual outcome
-        const actual = actualChange; // 'up' or 'down'
+        const actual = actualChange; // 'very bearish', 'bearish', 'neutral', 'bullish', 'very bullish'
 
         // Update score if prediction matches actual outcome
         if (userPrediction === actual) {
