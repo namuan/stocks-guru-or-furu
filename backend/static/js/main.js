@@ -191,6 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         grid: {
                             display: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 10,
+                            maxRotation: 45,
+                            minRotation: 45
                         }
                     },
                     y: {
