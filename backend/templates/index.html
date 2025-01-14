@@ -4,14 +4,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Stocks - What Happened Next?</title>
+    <title>Guru or Furu?</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <!-- Welcome Screen -->
 <div id="welcome-screen" class="screen active">
-    <h1>Stocks - What Happened Next?</h1>
+    <h1>Guru or Furu?</h1>
+    <p class="subtitle">Can you really predict the market?</p>
     <button id="start-game-btn">Start Game</button>
 </div>
 
@@ -29,11 +30,8 @@
         <canvas id="stock-chart"></canvas>
     </div>
     <div id="prediction-buttons">
-        <button class="predict-btn" data-prediction="very bearish">Very Bearish</button>
-        <button class="predict-btn" data-prediction="bearish">Bearish</button>
-        <button class="predict-btn" data-prediction="neutral">Neutral</button>
-        <button class="predict-btn" data-prediction="bullish">Bullish</button>
-        <button class="predict-btn" data-prediction="very bullish">Very Bullish</button>
+        <button class="predict-btn" data-prediction="up">Up</button>
+        <button class="predict-btn" data-prediction="down">Down</button>
         <p>Streak: <span id="streak">0</span></p>
     </div>
     <div id="game-stats">
@@ -47,9 +45,6 @@
     <div class="chart-container" style="position: relative; height:400px; width:100%; max-width:800px; margin:0 auto;">
         <canvas id="result-chart"></canvas>
     </div>
-    <p>Your Prediction: <span id="user-prediction"></span></p>
-    <p>Actual Outcome: <span id="actual-outcome"></span></p>
-    <p>Price Change: <span id="percentage-change"></span></p>
     <p>Points Earned: <span id="points-earned"></span></p>
     <button id="next-round-btn">Next Stock</button>
     <button id="end-game-btn">End Game</button>

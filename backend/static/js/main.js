@@ -225,33 +225,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function evaluatePrediction() {
-        const { prices, dates, visibleDays, predictionDays } = currentStockData;
+        const { ticker, prices, dates, visibleDays, predictionDays, actualChange } = currentStockData;
         const lastVisiblePrice = prices[visibleDays - 1];
         const futurePrice = prices[visibleDays + predictionDays - 1];
         const percentageChange = ((futurePrice - lastVisiblePrice) / lastVisiblePrice * 100);
 
-        function determineCategory(change) {
-            if (change <= -3) return "very bearish";
-            if (change <= -1) return "bearish";
-            if (change >= 3) return "very bullish";
-            if (change >= 1) return "bullish";
-            return "neutral";
-        }
-
-        const actualCategory = determineCategory(percentageChange);
-
         let resultSummary;
-        if (userPrediction === actualCategory) {
-            resultSummary = `Correct! The stock went ${actualCategory} (${percentageChange.toFixed(2)}%)`;
+        if (userPrediction === actualChange) {
+            resultSummary = `Correct! ${ticker} went ${actualChange} ${percentageChange.toFixed(2)}%`;
         } else {
-            resultSummary = `Not quite. The stock went ${actualCategory} (${percentageChange.toFixed(2)}%)`;
+            resultSummary = `Not quite. ${ticker} went ${actualChange} ${percentageChange.toFixed(2)}%`;
         }
         document.getElementById('result-title').textContent = resultSummary;
 
         let pointsEarned = 0;
         totalPredictions++;
 
-        if (userPrediction === actualCategory) {
+        if (userPrediction === actualChange) {
             pointsEarned = 10;
             currentScore += pointsEarned;
             correctPredictions++;
@@ -381,11 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        userPredictionSpan.textContent = userPrediction.toUpperCase();
-        actualOutcomeSpan.textContent = actualCategory.toUpperCase();
-        document.getElementById('percentage-change').textContent = `${percentageChange.toFixed(2)}%`;
         document.getElementById('points-earned').textContent = pointsEarned;
-
         gameScreen.classList.remove('active');
         resultScreen.classList.add('active');
     }
