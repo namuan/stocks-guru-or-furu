@@ -24,7 +24,9 @@
 <!-- Game Screen -->
 <div id="game-screen" class="screen">
     <h2 id="stock-name">Company Name (TICKER)</h2>
-    <canvas id="stock-chart"></canvas>
+    <div class="chart-container" style="position: relative; height:400px; width:100%; max-width:800px; margin:0 auto;">
+        <canvas id="stock-chart"></canvas>
+    </div>
     <div id="prediction-buttons">
         <button class="predict-btn" data-prediction="very bearish">Very Bearish</button>
         <button class="predict-btn" data-prediction="bearish">Bearish</button>
@@ -41,10 +43,15 @@
 <!-- Result Screen -->
 <div id="result-screen" class="screen">
     <h2>Result</h2>
-    <canvas id="result-chart"></canvas>
+    <div class="chart-container" style="position: relative; height:400px; width:100%; max-width:800px; margin:0 auto;">
+        <canvas id="result-chart"></canvas>
+    </div>
     <p>Your Prediction: <span id="user-prediction"></span></p>
     <p>Actual Outcome: <span id="actual-outcome"></span></p>
-    <button id="next-round-btn">Next Round</button>
+    <p>Price Change: <span id="percentage-change"></span></p>
+    <p>Points Earned: <span id="points-earned"></span></p>
+    <button id="next-round-btn">Next Stock</button>
+    <button id="end-game-btn">End Game</button>
 </div>
 
 <!-- Error Screen -->

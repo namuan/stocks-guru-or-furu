@@ -43,6 +43,26 @@ button {
     font-size: 1.2em;
 }
 
+#stock-chart {
+    height: 400px !important;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.chart-container {
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+#stock-chart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 /* Loading Screen Styles */
 #loading-screen .spinner {
     margin: 20px auto;
@@ -74,3 +94,4 @@ button {
 #error-screen button#back-home-btn {
     background-color: #3498db;
 }
+

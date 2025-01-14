@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Buttons
     const startGameBtn = document.getElementById('start-game-btn');
     const nextRoundBtn = document.getElementById('next-round-btn');
+    const endGameBtn = document.getElementById('end-game-btn');
     const retryBtn = document.getElementById('retry-btn');
     const backHomeBtn = document.getElementById('back-home-btn');
 
@@ -41,6 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
         resultScreen.classList.remove('active');
         loadingScreen.classList.add('active');
         fetchStockData();
+    });
+
+    endGameBtn.addEventListener('click', () => {
+        resultScreen.classList.remove('active');
+        welcomeScreen.classList.add('active');
+        currentScore = 0;
+        currentStreak = 0;
+        scoreSpan.textContent = '0';
+        streakSpan.textContent = '0';
     });
 
     retryBtn.addEventListener('click', () => {
@@ -92,6 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const visiblePrices = prices.slice(0, -1);
         const visibleDates = dates.slice(0, -1);
 
+        // For debugging
+        console.log('Visible Prices:', visiblePrices);
+        console.log('Visible Dates:', visibleDates);
+
         // Destroy existing chart if any
         if (currentChart) {
             currentChart.destroy();
@@ -102,37 +116,81 @@ document.addEventListener('DOMContentLoaded', () => {
         streakSpan.textContent = currentStreak;
 
         const ctx = document.getElementById('stock-chart').getContext('2d');
+
+        // Ensure we're working with valid numbers
+        const chartData = visiblePrices.map(price => ({
+            y: parseFloat(price),
+            x: price // Keep original value for debugging
+        }));
+
+        console.log('Chart Data:', chartData);
+
         currentChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: visibleDates,
                 datasets: [{
-                    label: 'Price ($)',
-                    data: visiblePrices,
-                    borderColor: 'blue',
-                    fill: false
+                    label: 'Stock Price',
+                    data: visiblePrices.map(price => parseFloat(price)), // Convert to numbers
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1,
+                    borderWidth: 2,
+                    fill: false,
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgb(75, 192, 192)',
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 6,
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
                     tooltip: {
-                        enabled: true
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return `Price: $${context.raw.toFixed(2)}`;
+                            }
+                        }
                     }
                 },
                 scales: {
                     x: {
+                        type: 'category',
                         display: true,
                         title: {
                             display: true,
-                            text: 'Date'
+                            text: 'Date',
+                            font: {
+                                size: 14
+                            }
+                        },
+                        grid: {
+                            display: false
                         }
                     },
                     y: {
+                        type: 'linear',
                         display: true,
+                        beginAtZero: false,
                         title: {
                             display: true,
-                            text: 'Price ($)'
+                            text: 'Price ($)',
+                            font: {
+                                size: 14
+                            }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toFixed(2);
+                            }
                         }
                     }
                 }
@@ -143,54 +201,98 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to Evaluate User Prediction
     function evaluatePrediction() {
         const { prices, dates, actualChange } = currentStockData;
+        const lastPrice = prices[prices.length - 1];
+        const previousPrice = prices[prices.length - 2];
+        const percentageChange = ((lastPrice - previousPrice) / previousPrice * 100).toFixed(2);
 
-        // Determine actual outcome
-        const actual = actualChange; // 'very bearish', 'bearish', 'neutral', 'bullish', 'very bullish'
-
-        // Update score if prediction matches actual outcome
-        if (userPrediction === actual) {
-            currentScore += 1;
+        // Calculate points for this round
+        let pointsEarned = 0;
+        if (userPrediction === actualChange) {
+            pointsEarned = 10;
+            currentScore += pointsEarned;
             scoreSpan.textContent = currentScore;
         }
 
-        // Reveal the hidden data point
-        // Show the complete chart
+        // Destroy existing chart if any
         if (currentChart) {
             currentChart.destroy();
         }
 
-        const ctx = document.getElementById('stock-chart').getContext('2d');
+        // Create new chart with all data points
+        const ctx = document.getElementById('result-chart').getContext('2d');
+
+        // Convert prices to numbers and add highlight for the last point
+        const chartData = prices.map((price, index) => parseFloat(price));
+        const backgroundColors = prices.map((_, index) =>
+            index === prices.length - 1 ? 'red' : 'rgb(75, 192, 192)'
+        );
+
         currentChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: dates,
                 datasets: [{
-                    label: 'Price ($)',
-                    data: prices,
-                    borderColor: 'blue',
-                    fill: false
+                    label: 'Stock Price',
+                    data: chartData,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1,
+                    borderWidth: 2,
+                    fill: false,
+                    pointRadius: (ctx) => ctx.dataIndex === prices.length - 1 ? 6 : 4,
+                    pointBackgroundColor: backgroundColors,
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 6,
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
                     tooltip: {
-                        enabled: true
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return `Price: $${context.raw.toFixed(2)}`;
+                            }
+                        }
                     }
                 },
                 scales: {
                     x: {
+                        type: 'category',
                         display: true,
                         title: {
                             display: true,
-                            text: 'Date'
+                            text: 'Date',
+                            font: {
+                                size: 14
+                            }
+                        },
+                        grid: {
+                            display: false
                         }
                     },
                     y: {
+                        type: 'linear',
                         display: true,
+                        beginAtZero: false,
                         title: {
                             display: true,
-                            text: 'Price ($)'
+                            text: 'Price ($)',
+                            font: {
+                                size: 14
+                            }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toFixed(2);
+                            }
                         }
                     }
                 }
@@ -199,7 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update Result Screen
         userPredictionSpan.textContent = userPrediction.toUpperCase();
-        actualOutcomeSpan.textContent = actual.toUpperCase();
+        actualOutcomeSpan.textContent = actualChange.toUpperCase();
+        document.getElementById('percentage-change').textContent = `${percentageChange}%`;
+        document.getElementById('points-earned').textContent = pointsEarned;
 
         // Show Result Screen
         gameScreen.classList.remove('active');
