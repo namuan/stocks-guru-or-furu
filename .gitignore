@@ -1,0 +1,10 @@
+# ignore all root items
+/*
+
+# unignore folders
+!backend/
+
+# unignore files
+!.gitignore
+!PLAN.md
+!README.md
