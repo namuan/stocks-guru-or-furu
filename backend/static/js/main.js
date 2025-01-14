@@ -200,14 +200,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to Evaluate User Prediction
     function evaluatePrediction() {
-        const { prices, dates, actualChange } = currentStockData;
+        const { prices, dates } = currentStockData;
         const lastPrice = prices[prices.length - 1];
         const previousPrice = prices[prices.length - 2];
-        const percentageChange = ((lastPrice - previousPrice) / previousPrice * 100).toFixed(2);
+        const percentageChange = ((lastPrice - previousPrice) / previousPrice * 100);
+
+        // Determine actual outcome category based on percentage change
+        function determineCategory(change) {
+            if (change <= -3) return "very bearish";
+            if (change <= -1) return "bearish";
+            if (change >= 3) return "very bullish";
+            if (change >= 1) return "bullish";
+            return "neutral";
+        }
+
+        const actualCategory = determineCategory(percentageChange);
 
         // Calculate points for this round
         let pointsEarned = 0;
-        if (userPrediction === actualChange) {
+        if (userPrediction === actualCategory) {
             pointsEarned = 10;
             currentScore += pointsEarned;
             scoreSpan.textContent = currentScore;
@@ -301,8 +312,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update Result Screen
         userPredictionSpan.textContent = userPrediction.toUpperCase();
-        actualOutcomeSpan.textContent = actualChange.toUpperCase();
-        document.getElementById('percentage-change').textContent = `${percentageChange}%`;
+        actualOutcomeSpan.textContent = actualCategory.toUpperCase();
+        document.getElementById('percentage-change').textContent = `${percentageChange.toFixed(2)}%`;
         document.getElementById('points-earned').textContent = pointsEarned;
 
         // Show Result Screen
