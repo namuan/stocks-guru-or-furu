@@ -42,3 +42,35 @@ button {
     margin-top: 20px;
     font-size: 1.2em;
 }
+
+/* Loading Screen Styles */
+#loading-screen .spinner {
+    margin: 20px auto;
+    width: 40px;
+    height: 40px;
+    border: 4px solid #cccccc;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Error Screen Styles */
+#error-screen p {
+    color: red;
+    font-size: 1.2em;
+}
+
+#error-screen button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+#error-screen button#back-home-btn {
+    background-color: #3498db;
+}
