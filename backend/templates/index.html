@@ -1,0 +1,42 @@
+<!-- backend/templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stocks - What Happened Next?</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<!-- Welcome Screen -->
+<div id="welcome-screen" class="screen active">
+    <h1>Stocks - What Happened Next?</h1>
+    <button id="start-game-btn">Start Game</button>
+</div>
+
+<!-- Game Screen -->
+<div id="game-screen" class="screen">
+    <h2 id="stock-name">Company Name (TICKER)</h2>
+    <canvas id="stock-chart"></canvas>
+    <div id="prediction-buttons">
+        <button class="predict-btn" data-prediction="up">Up</button>
+        <button class="predict-btn" data-prediction="down">Down</button>
+    </div>
+    <div id="game-stats">
+        <p>Score: <span id="score">0</span></p>
+    </div>
+</div>
+
+<!-- Result Screen -->
+<div id="result-screen" class="screen">
+    <h2>Result</h2>
+    <canvas id="result-chart"></canvas>
+    <p>Your Prediction: <span id="user-prediction"></span></p>
+    <p>Actual Outcome: <span id="actual-outcome"></span></p>
+    <button id="next-round-btn">Next Round</button>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
