@@ -6,21 +6,10 @@ import yfinance as yf
 from flask import Flask, render_template, jsonify
 from flask_cors import CORS  # Only if frontend is served from a different origin
 
+from stock_config import PREDEFINED_STOCKS
+
 app = Flask(__name__)
 CORS(app)  # Enable CORS if needed
-
-PREDEFINED_STOCKS = [
-    {'ticker': 'AAPL', 'company': 'Apple Inc.'},
-    {'ticker': 'GOOGL', 'company': 'Alphabet Inc.'},
-    {'ticker': 'MSFT', 'company': 'Microsoft Corporation'},
-    {'ticker': 'AMZN', 'company': 'Amazon.com Inc.'},
-    {'ticker': 'TSLA', 'company': 'Tesla Inc.'},
-    {'ticker': 'META', 'company': 'Meta Platforms Inc.'},  # FB changed to META
-    {'ticker': 'NFLX', 'company': 'Netflix Inc.'},
-    {'ticker': 'NVDA', 'company': 'NVIDIA Corporation'},
-    {'ticker': 'JPM', 'company': 'JPMorgan Chase & Co.'},
-    {'ticker': 'V', 'company': 'Visa Inc.'}
-]
 
 
 @app.route('/')
