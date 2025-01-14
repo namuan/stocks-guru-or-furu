@@ -95,3 +95,43 @@ button {
     background-color: #3498db;
 }
 
+/* Game Over Screen Styles */
+.stats-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: 20px auto;
+    max-width: 400px;
+}
+
+.stats-container p {
+    font-size: 1.2em;
+    margin: 10px 0;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.stats-container p:last-child {
+    border-bottom: none;
+}
+
+#game-over-screen button {
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 1.1em;
+}
+
+#play-again-btn {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+#game-over-home-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}

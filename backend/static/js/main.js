@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameScreen = document.getElementById('game-screen');
     const resultScreen = document.getElementById('result-screen');
     const errorScreen = document.getElementById('error-screen');
+    const gameOverScreen = document.getElementById('game-over-screen');
 
     // Buttons
     const startGameBtn = document.getElementById('start-game-btn');
@@ -14,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const endGameBtn = document.getElementById('end-game-btn');
     const retryBtn = document.getElementById('retry-btn');
     const backHomeBtn = document.getElementById('back-home-btn');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const gameOverHomeBtn = document.getElementById('game-over-home-btn');
 
     // Game Elements
     const stockName = document.getElementById('stock-name');
@@ -24,12 +27,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Prediction Buttons
     const predictButtons = document.querySelectorAll('.predict-btn');
     const streakSpan = document.getElementById('streak');
-    let currentStreak = 0;
 
+    // Game State Variables
+    let currentStreak = 0;
     let currentScore = 0;
-    let currentChart = null; // To manage Chart.js instances
-    let currentStockData = null; // To store fetched stock data
+    let currentChart = null;
+    let currentStockData = null;
     let userPrediction = '';
+    let totalPredictions = 0;
+    let correctPredictions = 0;
+    let bestStreak = 0;
 
     // Event Listeners
     startGameBtn.addEventListener('click', () => {
@@ -46,11 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     endGameBtn.addEventListener('click', () => {
         resultScreen.classList.remove('active');
-        welcomeScreen.classList.add('active');
-        currentScore = 0;
-        currentStreak = 0;
-        scoreSpan.textContent = '0';
-        streakSpan.textContent = '0';
+        document.getElementById('final-score').textContent = currentScore;
+        document.getElementById('total-predictions').textContent = totalPredictions;
+        document.getElementById('correct-predictions').textContent = correctPredictions;
+        document.getElementById('best-streak').textContent = bestStreak;
+        gameOverScreen.classList.add('active');
     });
 
     retryBtn.addEventListener('click', () => {
@@ -64,6 +71,19 @@ document.addEventListener('DOMContentLoaded', () => {
         welcomeScreen.classList.add('active');
     });
 
+    playAgainBtn.addEventListener('click', () => {
+        gameOverScreen.classList.remove('active');
+        loadingScreen.classList.add('active');
+        resetGame();
+        fetchStockData();
+    });
+
+    gameOverHomeBtn.addEventListener('click', () => {
+        gameOverScreen.classList.remove('active');
+        welcomeScreen.classList.add('active');
+        resetGame();
+    });
+
     // Handle Prediction Buttons
     predictButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -72,7 +92,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Function to Fetch Stock Data from Backend
+    function resetGame() {
+        currentScore = 0;
+        currentStreak = 0;
+        totalPredictions = 0;
+        correctPredictions = 0;
+        scoreSpan.textContent = '0';
+        streakSpan.textContent = '0';
+    }
+
     function fetchStockData() {
         fetch('/api/get_stock')
             .then(response => response.json())
@@ -93,20 +121,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // Function to Load Game Screen with Fetched Data
     function loadGame() {
         const { ticker, company, prices, dates } = currentStockData;
         stockName.textContent = `${company} (${ticker})`;
 
-        // Hide the last data point (hidden) and use the rest for the initial chart
         const visiblePrices = prices.slice(0, -1);
         const visibleDates = dates.slice(0, -1);
 
-        // For debugging
-        console.log('Visible Prices:', visiblePrices);
-        console.log('Visible Dates:', visibleDates);
-
-        // Destroy existing chart if any
         if (currentChart) {
             currentChart.destroy();
             currentStreak += 1;
@@ -116,14 +137,10 @@ document.addEventListener('DOMContentLoaded', () => {
         streakSpan.textContent = currentStreak;
 
         const ctx = document.getElementById('stock-chart').getContext('2d');
-
-        // Ensure we're working with valid numbers
         const chartData = visiblePrices.map(price => ({
             y: parseFloat(price),
-            x: price // Keep original value for debugging
+            x: price
         }));
-
-        console.log('Chart Data:', chartData);
 
         currentChart = new Chart(ctx, {
             type: 'line',
@@ -131,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 labels: visibleDates,
                 datasets: [{
                     label: 'Stock Price',
-                    data: visiblePrices.map(price => parseFloat(price)), // Convert to numbers
+                    data: visiblePrices.map(price => parseFloat(price)),
                     borderColor: 'rgb(75, 192, 192)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     tension: 0.1,
@@ -198,14 +215,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Function to Evaluate User Prediction
     function evaluatePrediction() {
         const { prices, dates } = currentStockData;
         const lastPrice = prices[prices.length - 1];
         const previousPrice = prices[prices.length - 2];
         const percentageChange = ((lastPrice - previousPrice) / previousPrice * 100);
 
-        // Determine actual outcome category based on percentage change
         function determineCategory(change) {
             if (change <= -3) return "very bearish";
             if (change <= -1) return "bearish";
@@ -216,24 +231,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const actualCategory = determineCategory(percentageChange);
 
-        // Calculate points for this round
         let pointsEarned = 0;
+        totalPredictions++;
+
         if (userPrediction === actualCategory) {
             pointsEarned = 10;
             currentScore += pointsEarned;
+            correctPredictions++;
             scoreSpan.textContent = currentScore;
         }
 
-        // Destroy existing chart if any
+        bestStreak = Math.max(bestStreak, currentStreak);
+
+        if (totalPredictions >= 10) {
+            document.getElementById('final-score').textContent = currentScore;
+            document.getElementById('total-predictions').textContent = totalPredictions;
+            document.getElementById('correct-predictions').textContent = correctPredictions;
+            document.getElementById('best-streak').textContent = bestStreak;
+
+            gameScreen.classList.remove('active');
+            resultScreen.classList.remove('active');
+            gameOverScreen.classList.add('active');
+            return;
+        }
+
         if (currentChart) {
             currentChart.destroy();
         }
 
-        // Create new chart with all data points
         const ctx = document.getElementById('result-chart').getContext('2d');
-
-        // Convert prices to numbers
-        const chartData = prices.map((price, index) => parseFloat(price));
+        const chartData = prices.map(price => parseFloat(price));
 
         currentChart = new Chart(ctx, {
             type: 'line',
@@ -332,13 +359,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Update Result Screen
         userPredictionSpan.textContent = userPrediction.toUpperCase();
         actualOutcomeSpan.textContent = actualCategory.toUpperCase();
         document.getElementById('percentage-change').textContent = `${percentageChange.toFixed(2)}%`;
         document.getElementById('points-earned').textContent = pointsEarned;
 
-        // Show Result Screen
         gameScreen.classList.remove('active');
         resultScreen.classList.add('active');
     }
