@@ -3,6 +3,7 @@
 
 # unignore folders
 !backend/
+!docs/
 
 # unignore files
 !.gitignore
