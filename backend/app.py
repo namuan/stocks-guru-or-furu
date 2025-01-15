@@ -43,11 +43,14 @@ def get_stock():
         if data.empty:
             return jsonify({'error': 'No data found for the selected stock.'}), 404
 
-        # Extract closing prices and dates
+        # Extract OHLC and closing prices and dates
+        ohlc_data = [{
+            'x': int(date.timestamp() * 1000),
+            'y': [row['Open'].iloc[0], row['High'].iloc[0], row['Low'].iloc[0], row['Close'].iloc[0]]
+        } for date, row in data[['Open', 'High', 'Low', 'Close']].iterrows()]
         close_data = data['Close']
 
         history = close_data.values.tolist()
-        dates = data.index.strftime('%Y-%m-%d').tolist()
 
         # Show all data except the last week (which will be revealed after prediction)
         prediction_days = 5  # 5 trading days = 1 week
@@ -62,14 +65,14 @@ def get_stock():
             'ticker': ticker,
             'company': company,
             'prices': history,
-            'dates': dates,
+            'ohlc': ohlc_data,
             'visibleDays': visible_days,
             'predictionDays': prediction_days,
             'actualChange': actual_change
-        })
+        }), 200
 
     except Exception as e:
-        logging.error(f"Error: {e}", e)
+        logging.error(f"Error: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
 

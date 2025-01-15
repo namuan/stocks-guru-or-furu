@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <title>Guru or Furu?</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
 <!-- Welcome Screen -->
@@ -27,12 +27,11 @@
     <h2 id="stock-name">Company Name (TICKER)</h2>
     <p id="prediction-question" class="text-lg mt-4 mb-6"></p>
     <div class="chart-container" style="position: relative; height:400px; width:100%; max-width:800px; margin:0 auto;">
-        <canvas id="stock-chart"></canvas>
+        <div id="apex-chart"></div>
     </div>
     <div id="prediction-buttons">
         <button class="predict-btn" data-prediction="up">Up</button>
         <button class="predict-btn" data-prediction="down">Down</button>
-        <p>Streak: <span id="streak">0</span></p>
     </div>
     <div id="game-stats">
         <p>Score: <span id="score">0</span></p>
@@ -43,7 +42,7 @@
 <div id="result-screen" class="screen">
     <h2 id="result-title"></h2>
     <div class="chart-container" style="position: relative; height:400px; width:100%; max-width:800px; margin:0 auto;">
-        <canvas id="result-chart"></canvas>
+        <div id="apex-result-chart"></div>
     </div>
     <p>Points Earned: <span id="points-earned"></span></p>
     <button id="next-round-btn">Next Stock</button>
@@ -57,7 +56,6 @@
         <p>Final Score: <span id="final-score">0</span></p>
         <p>Total Predictions: <span id="total-predictions">0</span></p>
         <p>Correct Predictions: <span id="correct-predictions">0</span></p>
-        <p>Best Streak: <span id="best-streak">0</span></p>
     </div>
     <button id="play-again-btn">Play Again</button>
     <button id="game-over-home-btn">Back to Home</button>
