@@ -16,26 +16,25 @@ No accounts needed - just jump in and start predicting!
 
 ```shell
 git clone https://github.com/namuan/stocks-guru-or-furu.git
-cd stocks-guru-or-furu 
+cd stocks-guru-or-furu
 ```
 
 ### Setup Virtual Environment
 
 ```shell
-python3 -m venv venv         
-source venv/bin/activate                                                      
+uv venv
 ```
 
 ### Install Dependencies
 
 ```shell
-python3 -m pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 ### Run Server
 
 ```shell
-$ python3 backend/app.py
+uv run backend/app.py
 ```
 
 Visit `http://127.0.0.1:5001` in your browser.
