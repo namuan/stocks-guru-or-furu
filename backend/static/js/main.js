@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function evaluatePrediction() {
-        const {ticker, prices, ohlc, visibleDays, predictionDays, actualChange} = currentStockData;
+        const {ticker, prices, ohlc, visibleDays, predictionDays, actualChange, questionStartDate, questionEndDate} = currentStockData;
         const lastVisiblePrice = prices[visibleDays - 1];
         const futurePrice = prices[visibleDays + predictionDays - 1];
         const percentageChange = ((futurePrice - lastVisiblePrice) / lastVisiblePrice * 100);
@@ -175,6 +175,26 @@ document.addEventListener('DOMContentLoaded', () => {
             resultSummary = `Not quite. ${ticker} went ${actualChange} ${percentageChange.toFixed(2)}%`;
         }
         document.getElementById('result-title').textContent = resultSummary;
+
+        // Update dates
+        const datesElement = document.getElementById('result-dates');
+        if (datesElement) {
+             datesElement.textContent = `Period: ${questionStartDate} to ${questionEndDate}`;
+        }
+
+        // Update TradingView link
+        const linkContainer = document.getElementById('tradingview-link-container');
+        if (linkContainer) {
+            const link = document.createElement('a');
+            link.href = `https://www.tradingview.com/chart/?symbol=${ticker}`;
+            link.textContent = `View ${ticker} on TradingView`;
+            link.target = '_blank';
+            link.style.color = '#007bff';
+            link.style.textDecoration = 'underline';
+            
+            linkContainer.innerHTML = '';
+            linkContainer.appendChild(link);
+        }
 
         let pointsEarned = 0;
         totalPredictions++;

@@ -85,6 +85,11 @@ def get_stock():
         future_price = history[visible_days + prediction_days - 1]
         actual_change = 'up' if future_price > last_visible_price else 'down'
 
+        # Get dates for the question period
+        visible_data = data.iloc[:visible_days]
+        start_date_str = visible_data.index[0].strftime('%Y-%m-%d')
+        end_date_str = visible_data.index[-1].strftime('%Y-%m-%d')
+
         return jsonify({
             'ticker': ticker,
             'company': company,
@@ -92,7 +97,9 @@ def get_stock():
             'ohlc': ohlc_data,
             'visibleDays': visible_days,
             'predictionDays': prediction_days,
-            'actualChange': actual_change
+            'actualChange': actual_change,
+            'questionStartDate': start_date_str,
+            'questionEndDate': end_date_str
         }), 200
 
     except Exception as e:
