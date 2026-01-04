@@ -1,15 +1,36 @@
 import logging
 import random
+import csv
+import os
 from datetime import datetime, timedelta
 
 import yfinance as yf
 from flask import Flask, render_template, jsonify
 from flask_cors import CORS  # Only if frontend is served from a different origin
 
-from stock_config import PREDEFINED_STOCKS
-
 app = Flask(__name__)
 CORS(app)  # Enable CORS if needed
+
+# Load stocks from CSV at startup
+STOCKS = []
+try:
+    csv_path = os.path.join(os.path.dirname(__file__), 'alllisted.csv')
+    with open(csv_path, 'r') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row['Symbol'] and row['Description']:
+                description = row['Description']
+                if 'Common Stock' in description:
+                    # Filter to include only Common Stock, and remove the phrase from the name
+                    clean_company = description.replace('Common Stock', '').strip()
+                    STOCKS.append({
+                        'ticker': row['Symbol'],
+                        'company': clean_company
+                    })
+    logging.info(f"Loaded {len(STOCKS)} stocks from {csv_path}")
+except Exception as e:
+    logging.error(f"Error loading stocks from CSV: {e}")
+    STOCKS = []
 
 
 @app.route('/')
@@ -20,8 +41,11 @@ def index():
 @app.route('/api/get_stock')
 def get_stock():
     try:
+        if not STOCKS:
+            return jsonify({'error': 'No stocks available.'}), 500
+
         # Randomly select a stock
-        stock = random.choice(PREDEFINED_STOCKS)
+        stock = random.choice(STOCKS)
         ticker = stock['ticker']
         company = stock['company']
 
